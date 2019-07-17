@@ -19,7 +19,14 @@ const DEFAULT_NAME: &str = "#natsclientrust";
 const DEFAULT_PORT: u16 = 4222;
 
 pub(crate) fn parse_nats_uri(uri: &str) -> Result<Url> {
-    let url = Url::parse(uri)?;
+    let url_str = if uri.to_owned().contains("://") {
+        uri.to_owned()
+    } else {
+        let mut url_str = "nats://".to_owned();
+        url_str.push_str(uri);
+        url_str
+    };
+    let url = Url::parse(&url_str)?;
     if url.scheme() != URI_SCHEME {
         Err(err!(UriParseFailure, "Failed to parse NATS URI"))
     } else {
